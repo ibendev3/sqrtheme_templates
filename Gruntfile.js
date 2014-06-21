@@ -38,30 +38,49 @@
                     files: ["<%= yeoman.app %>/index.html", "<%= yeoman.app %>/views/**/*.html", "<%= yeoman.app %>/styles/**/*.less", ".tmp/styles/**/*.css", "{.tmp,<%= yeoman.app %>}/scripts/**/*.js", "<%= yeoman.app %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}"]
                 }
             },
+            // The actual grunt server settings
             connect: {
                 options: {
-                    port: 8000,
-                    hostname: "localhost"
+                    port: 8080,
+                    // Change this to '0.0.0.0' to access the server from outside.
+                    hostname: 'localhost',
+                    livereload: 35729
                 },
                 livereload: {
                     options: {
+                        open: true,
                         middleware: function (connect) {
-                            return [lrSnippet, mountFolder(connect, ".tmp"), mountFolder(connect, yeomanConfig.app)];
+                            return [
+                                connect.static('.tmp'),
+                                connect().use(
+                                    '/bower_components',
+                                    connect.static('./bower_components')
+                                ),
+                                connect.static(yeomanConfig.app)
+                            ];
                         }
                     }
                 },
                 test: {
                     options: {
+                        port: 9001,
                         middleware: function (connect) {
-                            return [mountFolder(connect, ".tmp"), mountFolder(connect, "test")];
+                            return [
+                                connect.static('.tmp'),
+                                connect.static('test'),
+                                connect().use(
+                                    'bower_components',
+                                    connect.static('./bower_components')
+                                ),
+                                connect.static(yeomanConfig.app)
+                            ];
                         }
                     }
                 },
                 dist: {
                     options: {
-                        middleware: function (connect) {
-                            return [mountFolder(connect, yeomanConfig.dist)];
-                        }
+                        open: true,
+                        base: '<%= yeoman.dist %>'
                     }
                 }
             },
@@ -86,6 +105,14 @@
                     jshintrc: ".jshintrc"
                 },
                 all: ["Gruntfile.js", "<%= yeoman.app %>/scripts/**/*.js"]
+            },
+            karma: {
+                unit: {
+                    options: {
+                        configFile: 'test/karma.conf.js',
+                        singleRun: true
+                    }
+                }
             },
             less: {
                 server: {
@@ -188,6 +215,7 @@
             },
             concurrent: {
                 server: ["less:server", "copy:styles"],
+                test: ["less:server", "copy:styles"],
                 dist: ["less:dist", "copy:styles", "htmlmin"]
             },
             concat: {
@@ -209,6 +237,12 @@
                 }
             }
         });
+        grunt.registerTask('test', [
+            'clean:server',
+            'concurrent:test',
+            'connect:test',
+            'karma'
+        ]);
         grunt.registerTask("server", function (target) {
             if (target === "dist") {
                 return grunt.task.run(["build", "open", "connect:dist:keepalive"]);

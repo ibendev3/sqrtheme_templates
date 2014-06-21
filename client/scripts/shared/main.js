@@ -24,6 +24,8 @@
             });
         }
     ]).controller('DashboardCtrl', ['$scope', function ($scope) {
+        $scope.awesomeThings = ['Big', 'Things', 'Happens'];
+
     }]);
 
 }).call(this);
