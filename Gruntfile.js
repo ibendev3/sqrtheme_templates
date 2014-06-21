@@ -1,16 +1,9 @@
 (function () {
     "use strict";
-    var LIVERELOAD_PORT, lrSnippet, mountFolder;
+    var LIVERELOAD_PORT;
 
     LIVERELOAD_PORT = 35728;
 
-    lrSnippet = require("connect-livereload")({
-        port: LIVERELOAD_PORT
-    });
-
-    mountFolder = function (connect, dir) {
-        return connect["static"](require("path").resolve(dir));
-    };
 
     module.exports = function (grunt) {
         var yeomanConfig;
@@ -20,10 +13,7 @@
             app: "client",
             dist: "dist"
         };
-        try {
-            yeomanConfig.app = require("./bower.json").appPath || yeomanConfig.app;
-        } catch (_error) {
-        }
+
         grunt.initConfig({
             yeoman: yeomanConfig,
             watch: {
