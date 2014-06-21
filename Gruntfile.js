@@ -27,23 +27,15 @@
         grunt.initConfig({
             yeoman: yeomanConfig,
             watch: {
-                coffee: {
-                    files: ["<%= yeoman.app %>/scripts/**/*.coffee"],
-                    tasks: ["coffee:dist"]
-                },
-                compass: {
-                    files: ["<%= yeoman.app %>/styles/**/*.{scss,sass}"],
-                    tasks: ["compass:server"]
-                },
                 less: {
-                    files: ["<%= yeoman.app %>/styles-less/**/*.less"],
+                    files: ["<%= yeoman.app %>/styles/**/*.less"],
                     tasks: ["less:server"]
                 },
                 livereload: {
                     options: {
                         livereload: LIVERELOAD_PORT
                     },
-                    files: ["<%= yeoman.app %>/index.html", "<%= yeoman.app %>/views/**/*.html", "<%= yeoman.app %>/styles/**/*.scss", "<%= yeoman.app %>/styles-less/**/*.less", ".tmp/styles/**/*.css", "{.tmp,<%= yeoman.app %>}/scripts/**/*.js", "<%= yeoman.app %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}"]
+                    files: ["<%= yeoman.app %>/index.html", "<%= yeoman.app %>/views/**/*.html", "<%= yeoman.app %>/styles/**/*.less", ".tmp/styles/**/*.css", "{.tmp,<%= yeoman.app %>}/scripts/**/*.js", "<%= yeoman.app %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}"]
                 }
             },
             connect: {
@@ -95,39 +87,6 @@
                 },
                 all: ["Gruntfile.js", "<%= yeoman.app %>/scripts/**/*.js"]
             },
-            compass: {
-                options: {
-                    sassDir: "<%= yeoman.app %>/styles",
-                    cssDir: ".tmp/styles",
-                    generatedImagesDir: ".tmp/styles/ui/images/",
-                    imagesDir: "<%= yeoman.app %>/styles/ui/images/",
-                    javascriptsDir: "<%= yeoman.app %>/scripts",
-                    fontsDir: "<%= yeoman.app %>/fonts",
-                    importPath: "<%= yeoman.app %>/bower_components",
-                    httpImagesPath: "styles/ui/images/",
-                    httpGeneratedImagesPath: "styles/ui/images/",
-                    httpFontsPath: "fonts",
-                    relativeAssets: true
-                },
-                dist: {
-                    options: {
-                        outputStyle: 'compressed',
-                        debugInfo: false,
-                        noLineComments: true
-                    }
-                },
-                server: {
-                    options: {
-                        debugInfo: true
-                    }
-                },
-                forvalidation: {
-                    options: {
-                        debugInfo: false,
-                        noLineComments: false
-                    }
-                }
-            },
             less: {
                 server: {
                     options: {
@@ -140,7 +99,7 @@
                     files: [
                         {
                             expand: true,
-                            cwd: "<%= yeoman.app %>/styles-less",
+                            cwd: "<%= yeoman.app %>/styles",
                             src: "main.less",
                             dest: ".tmp/styles",
                             ext: ".css"
@@ -155,42 +114,10 @@
                     files: [
                         {
                             expand: true,
-                            cwd: "<%= yeoman.app %>/styles-less",
+                            cwd: "<%= yeoman.app %>/styles",
                             src: "main.less",
                             dest: ".tmp/styles",
                             ext: ".css"
-                        }
-                    ]
-                }
-            },
-            coffee: {
-                server: {
-                    options: {
-                        sourceMap: true,
-                        sourceRoot: ""
-                    },
-                    files: [
-                        {
-                            expand: true,
-                            cwd: "<%= yeoman.app %>/scripts",
-                            src: "**/*.coffee",
-                            dest: ".tmp/scripts",
-                            ext: ".js"
-                        }
-                    ]
-                },
-                dist: {
-                    options: {
-                        sourceMap: false,
-                        sourceRoot: ""
-                    },
-                    files: [
-                        {
-                            expand: true,
-                            cwd: "<%= yeoman.app %>/scripts",
-                            src: "**/*.coffee",
-                            dest: ".tmp/scripts",
-                            ext: ".js"
                         }
                     ]
                 }
@@ -260,10 +187,8 @@
                 }
             },
             concurrent: {
-                server: ["coffee:server", "compass:server", "copy:styles"],
-                dist: ["coffee:dist", "compass:dist", "copy:styles", "htmlmin"],
-                lessServer: ["coffee:server", "less:server", "copy:styles"],
-                lessDist: ["coffee:dist", "less:dist", "copy:styles", "htmlmin"]
+                server: ["less:server", "copy:styles"],
+                dist: ["less:dist", "copy:styles", "htmlmin"]
             },
             concat: {
                 options: {
@@ -290,14 +215,8 @@
             }
             return grunt.task.run(["clean:server", "concurrent:server", "connect:livereload", "open", "watch"]);
         });
-        grunt.registerTask("lessServer", function (target) {
-            if (target === "dist") {
-                return grunt.task.run(["buildLess", "open", "connect:dist:keepalive"]);
-            }
-            return grunt.task.run(["clean:server", "concurrent:lessServer", "connect:livereload", "open", "watch"]);
-        });
+
         grunt.registerTask("build", ["clean:dist", "useminPrepare", "concurrent:dist", "copy:dist", "concat", "uglify", "usemin"]);
-        grunt.registerTask("buildLess", ["clean:dist", "useminPrepare", "concurrent:lessDist", "copy:dist", "concat", "uglify", "usemin"]);
         return grunt.registerTask("default", ["server"]);
     };
 
